@@ -18,3 +18,10 @@ alias sburp='sudo brew update && sudo brew outdated && sudo brew outdated --cask
 alias sz='source ~/.zshrc'
 alias cpv='rsync -ah --info=progress2'
 alias lt='gls --human-readable --size -1 -S -alh --classify'
+
+# Security
+alias gened='ssh-keygen -t ed25519 -a 100'
+alias genrsa='ssh-keygen -t rsa -b 4096 -o -a 100'
+
+# Overrides
+alias l='exa -lahg'

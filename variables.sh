@@ -10,12 +10,15 @@ export PATH="$PATH:/Users/stuartpurgavie/bin"
 
 export EDITOR='vim'
 
-export AWS_ACCESS_KEY_ID="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_access -w)"
-export AWS_SECRET_ACCESS_KEY="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_secret -w)"
-export AWS_SESSION_TOKEN="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_session -w)"
+if [[ "${OSTYPE}" = darwin* ]]; then
+  export AWS_ACCESS_KEY_ID="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_access -w)"
+  export AWS_SECRET_ACCESS_KEY="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_secret -w)"
+  export AWS_SESSION_TOKEN="$(security find-generic-password -a ${USER} -s aws_dou_terraform_training_session -w)"
 
-# Python Vault Onboarding Script
-export GL_TKN="$(security find-generic-password -a ${USER} -s tmo_gitlab_access_key -w)"
+  # Python Vault Onboarding Script
+  export GL_TKN="$(security find-generic-password -a ${USER} -s tmo_gitlab_access_key -w)"
 
+fi
 # Tools
 export LESS="--RAW-CONTROL-CHARS --quit-if-one-screen --no-init"
+

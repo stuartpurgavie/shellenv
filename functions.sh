@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # User Defined Functions
 
-source ~/.user_config/getopts_long.sh
+source ${SHELLENV}/getopts_long.sh
 
 echoerr() { printf "%s\n" "$*" >&2; }
 
@@ -166,7 +166,11 @@ function cl() {
     fi;
     builtin cd "${DIR}" && \
     # use your preferred ls command
-        gls -alh --color=auto
+	case "$(uname)" in
+		Darwin) gls -alh --color=auto ;;
+		Linux) l ;;
+		*) ls -alh --colour=auto ;;
+	esac
 }
 
 function git() {
