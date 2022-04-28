@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # User Defined Functions
 
-source ${SHELLENV}/getopts_long.sh
+source "${SHELLENV}/getopts_long.sh"
 
 echoerr() { printf "%s\n" "$*" >&2; }
 
@@ -177,16 +177,16 @@ function git() {
     typeset -A client
     case $1 in
         tmobile | tmo)
-            declare client[jira]="TEQSE2"
-            declare client[gpg]="FBD7E3FB7060FF348863BFE2C5E309D3047D6489"
-            declare client[email]="stuart.purgavie1@t-mobile.com"
-            declare client[ssh]="tmo"
+            client[jira]="TEQSE2"
+            client[gpg]="FBD7E3FB7060FF348863BFE2C5E309D3047D6489"
+            client[email]="stuart.purgavie1@t-mobile.com"
+            client[ssh]="tmo"
         ;;
         digitalonus | dou)
-            declare client[jira]="DEVON"
-            declare client[gpg]="F38931F996ECE696B88FBEF4B54182833B82405B"
-            declare client[email]="stuart.purgavie@digitalonus.com"
-            declare client[ssh]="dou"
+            client[jira]="DEVON"
+            client[gpg]="F38931F996ECE696B88FBEF4B54182833B82405B"
+            client[email]="stuart.purgavie@digitalonus.com"
+            client[ssh]="dou"
         ;;
         *)
             command git "$@"
@@ -195,23 +195,23 @@ function git() {
     esac
     case $2 in
         clone)
-            declare client[uri]=$(echo ${3} | sed -e "s/git@\(.*\)\.com:/git@\1.com-${client[ssh]}:/g")
+            client[uri]=$(echo "${3}" | sed -e "s/git@\(.*\)\.com:/git@\1.com-${client[ssh]}:/g")
             command git clone \
                 --config user.jira="${client[jira]}"\
                 --config user.signingkey="${client[gpg]}"\
                 --config user.email="${client[email]}"\
                 ${client[uri]} || return $?
-            cd $(basename "${3}" .git)
-            declare main=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-            command git config user.main ${main}
+            cd "$(basename "${3}" .git)" || return 1
+            main=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+            command git config user.main "${main}"
             cd ..
         ;;
         config)
             command git config user.jira       ${client[jira]}  || return $?
             command git config user.email      ${client[email]} || return $?
             command git config user.signingkey ${client[gpg]}   || return $?
-            declare main=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-            command git config user.main ${main}
+            main=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+            command git config user.main "${main}"
         ;;
         *)
             echoerr "subcommand not implemented"
@@ -222,14 +222,31 @@ function git() {
 }
 
 function hvfmt() {
-    for f in $(find . -type f -name "*.acl" | tr '\n' ' '); do vault policy fmt ${f} ; done
+    for f in $(find . -type f -name "*.acl" | tr '\n' ' '); do vault policy fmt "${f}" ; done
 }
 
 function htfmt() {
     terraform fmt -recursive
 }
 
+currentshell() {
+    ps -o comm= -p $$
+}
+
 function hvtoken() {
-    IFS= read -rs "VAULT_TOKEN?Please enter client token: "
+    case $(currentshell) in
+    zsh)
+        IFS= read -rs "VAULT_TOKEN?Please enter client token: "
+        printf "\n"
+    ;;
+    bash)
+        IFS= read -rs -p "Please enter client token: " VAULT_TOKEN
+        printf "\n"
+    ;;
+    *)
+        echoerr "shell $(currentshell) not supported"
+        return 1
+    ;;
+    esac
     export VAULT_TOKEN
 }

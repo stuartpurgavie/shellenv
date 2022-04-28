@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # User Defined Aliases
 
 # BREW
