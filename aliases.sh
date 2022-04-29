@@ -16,7 +16,7 @@ alias burp='brew update && brew outdated && brew outdated --cask && brew upgrade
 alias sburp='sudo brew update && sudo brew outdated && sudo brew outdated --cask && sudo brew upgrade && sudo brew upgrade --cask && sudo brew cleanup'
 
 # Environment
-alias sz='source ~/.zshrc'
+alias szr='source ~/.zshrc'
 alias cpv='rsync -ah --info=progress2'
 alias lt='gls --human-readable --size -1 -S -alh --classify'
 
