@@ -31,3 +31,7 @@ export LESS="--RAW-CONTROL-CHARS --quit-if-one-screen --no-init"
 # Games
 export POE_FILTER="${HOME}/.steam/root/steamapps/compatdata/238960/pfx/drive_c/users/steamuser/My Documents/My Games/Path of Exile"
 
+# Linux
+export EDITOR="vim"
+export SYSTEMD_EDITOR="vim"
+

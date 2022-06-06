@@ -188,6 +188,12 @@ function git() {
             client[email]="stuart.purgavie@digitalonus.com"
             client[ssh]="dou"
         ;;
+        default | def)
+            client[jira]="CLIP"
+            client[gpg]="6AD861E9D496B34FB41EC558FCAA9A536B5B4387"
+            client[email]="stuartpurgavie@uniqueservice.ca"
+            client[ssh]="def"
+        ;;
         *)
             command git "$@"
             return $?
@@ -250,3 +256,13 @@ function hvtoken() {
     esac
     export VAULT_TOKEN
 }
+
+function keybase_hack() {
+    /opt/keybase/Keybase --disable-gpu-sandbox &
+    keybase_pid=$!
+}
+
+function keybase_close() {
+    kill -9 ${keybase_pid}
+}
+
