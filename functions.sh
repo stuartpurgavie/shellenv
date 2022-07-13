@@ -266,3 +266,8 @@ function keybase_close() {
     kill -9 ${keybase_pid}
 }
 
+function find_hardlinks() {
+    find "${1}" -xdev \! -type d -links +1 -printf '%20D %20i %p\n' |
+      sort -n | uniq -w 42 --all-repeated=separate
+}
+

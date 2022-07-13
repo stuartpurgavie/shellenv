@@ -423,3 +423,7 @@ secring.*
 # Terraform files
 .terraform.lock.hcl
 */.terraform.lock.hcl
+
+# Secret Files
+vault.hclic
+

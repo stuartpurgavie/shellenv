@@ -14,6 +14,7 @@ alias bcubc='brew upgrade --cask && brew cleanup'
 alias bcubu='bcubo && bcubc'
 alias burp='brew update && brew outdated && brew outdated --cask && brew upgrade && brew upgrade --cask && brew cleanup'
 alias sburp='sudo brew update && sudo brew outdated && sudo brew outdated --cask && sudo brew upgrade && sudo brew upgrade --cask && sudo brew cleanup'
+alias upall='burp && sudo dnf upgrade -y && sudo flatpak update -y'
 
 # Environment
 alias szr='source ~/.zshrc'

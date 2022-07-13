@@ -9,6 +9,7 @@ export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
 # User controlled binary folder - takes lowest precedence
 export PATH="$PATH:/Users/stuartpurgavie/bin"
 export PATH="$PATH:/home/seraphic/bin"
+export PATH="${PATH}:/home/seraphic/go/bin"
 
 export EDITOR='vim'
 
@@ -25,11 +26,19 @@ if [[ "${OSTYPE}" = darwin* ]]; then
   export GL_TKN
 
 fi
+
 # Tools
 export LESS="--RAW-CONTROL-CHARS --quit-if-one-screen --no-init"
+export GOPATH="${HOME}/go"
+export VAULT_LICENSE="${SHELLENV}/vault.hclic"
+# Rust Tools
+export PATH="${PATH}:/home/seraphic/.cargo/bin"
 
 # Games
 export POE_FILTER="${HOME}/.steam/root/steamapps/compatdata/238960/pfx/drive_c/users/steamuser/My Documents/My Games/Path of Exile"
+export FF7R_USER="${HOME}/.steam/root/steamapps/compatdata/1462040/pfx/drive_c/users/steamuser/Documents/My Games/FINAL FANTASY VII REMAKE"
+export FF7R_APP="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Binaries/Win64"
+export FF7R_MOD="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Content/Paks/~mods"
 
 # Linux
 export EDITOR="vim"
