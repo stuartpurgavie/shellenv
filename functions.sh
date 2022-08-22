@@ -166,11 +166,15 @@ function cl() {
     fi;
     builtin cd "${DIR}" && \
     # use your preferred ls command
-	case "$(uname)" in
-		Darwin) gls -alh --color=auto ;;
-		Linux) l ;;
-		*) ls -alh --colour=auto ;;
-	esac
+    if type l > /dev/null 2>&1 ; then
+      l
+    elif type exa > /dev/null 2>&1 ; then
+      exa -lahg
+    elif type gls > /dev/null 2>&1 ; then
+      gls -alh --color=auto
+    else
+      ls -alh --colour=auto
+    fi
 }
 
 function git() {

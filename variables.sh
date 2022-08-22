@@ -39,6 +39,7 @@ export POE_FILTER="${HOME}/.steam/root/steamapps/compatdata/238960/pfx/drive_c/u
 export FF7R_USER="${HOME}/.steam/root/steamapps/compatdata/1462040/pfx/drive_c/users/steamuser/Documents/My Games/FINAL FANTASY VII REMAKE"
 export FF7R_APP="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Binaries/Win64"
 export FF7R_MOD="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Content/Paks/~mods"
+export SATIS_SAVES="${HOME}/.steam/root/steamapps/compatdata/526870/pfx/drive_c/users/steamuser/AppData/Local/FactoryGame/Saved/SaveGames/76561198063842308"
 
 # Linux
 export EDITOR="vim"
