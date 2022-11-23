@@ -271,7 +271,14 @@ function keybase_close() {
 }
 
 function find_hardlinks() {
-    find "${1}" -xdev \! -type d -links +1 -printf '%20D %20i %p\n' |
+    find "${1}" -xdev \! -type d -links +1 -printf '%6D %10i %p\n' |
       sort -n | uniq -w 42 --all-repeated=separate
 }
 
+function msch() {
+    folders=("/mnt/Linux_Storage/SortedMedia/TVShows")
+    for folder in ${folders[@]}; do
+        sudo chown -R seraphic:mediaserver "${folder}"
+        chmod -R 775 "${folder}"
+    done
+}

@@ -45,3 +45,5 @@ export SATIS_SAVES="${HOME}/.steam/root/steamapps/compatdata/526870/pfx/drive_c/
 export EDITOR="vim"
 export SYSTEMD_EDITOR="vim"
 
+# Docker
+export DOCKER_HOST=unix:///run/user/${UID}/podman/podman.sock
