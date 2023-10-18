@@ -27,7 +27,7 @@ alias gened='ssh-keygen -t ed25519 -a 100'
 alias genrsa='ssh-keygen -t rsa -b 4096 -o -a 100'
 
 # Overrides
-alias l='exa -lahg'
+alias l='exa -ilahg'
 
 # Applications
 alias girens='flatpak run nl.g4d.Girens'

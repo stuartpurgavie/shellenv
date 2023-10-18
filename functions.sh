@@ -282,3 +282,10 @@ function msch() {
         chmod -R 775 "${folder}"
     done
 }
+
+function arr() {
+    startdir=$(pwd)
+    cd "${ARRFOLDER}" || return 1
+    DOCKER_HOST="${POD_DOCKER_HOST}" sudo docker-compose down && sudo docker-compose up --force-recreate --build -d
+    cd "${startdir}" || return 1
+}

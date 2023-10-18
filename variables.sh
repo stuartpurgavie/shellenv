@@ -7,9 +7,10 @@ export PATH="/usr/local/sbin:$PATH"
 # GNU getopt builtin - needs highest precedence to override MacOS-provided binaries
 export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
 # User controlled binary folder - takes lowest precedence
-export PATH="$PATH:/Users/stuartpurgavie/bin"
-export PATH="$PATH:/home/seraphic/bin"
-export PATH="${PATH}:/home/seraphic/go/bin"
+export PATH="$PATH:${HOME}/bin"
+export PATH="${PATH}:${HOME}/go/bin"
+# PIP Utilities
+export PATH="${PATH}:${HOME}/.local/bin"
 
 export EDITOR='vim'
 
@@ -28,14 +29,15 @@ if [[ "${OSTYPE}" = darwin* ]]; then
 fi
 
 # Tools
+export WATCH_INTERVAL="5"
 export LESS="--RAW-CONTROL-CHARS --quit-if-one-screen --no-init"
 export GOPATH="${HOME}/go"
 export VAULT_LICENSE="${SHELLENV}/vault.hclic"
 # Rust Tools
-export PATH="${PATH}:/home/seraphic/.cargo/bin"
+export PATH="${PATH}:/${HOME}/.cargo/bin"
 
 # Games
-export POE_FILTER="${HOME}/.steam/root/steamapps/compatdata/238960/pfx/drive_c/users/steamuser/My Documents/My Games/Path of Exile"
+export POE_FILTER="/mnt/linux_programs/SteamLibrary/steamapps/compatdata/238960/pfx/drive_c/users/steamuser/Documents/My Games/Path of Exile"
 export FF7R_USER="${HOME}/.steam/root/steamapps/compatdata/1462040/pfx/drive_c/users/steamuser/Documents/My Games/FINAL FANTASY VII REMAKE"
 export FF7R_APP="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Binaries/Win64"
 export FF7R_MOD="${HOME}/.local/share/Steam/steamapps/common/FINAL FANTASY VII REMAKE/End/Content/Paks/~mods"
@@ -46,4 +48,5 @@ export EDITOR="vim"
 export SYSTEMD_EDITOR="vim"
 
 # Docker
-export DOCKER_HOST=unix:///run/user/${UID}/podman/podman.sock
+export POD_DOCKER_HOST=unix:///run/user/${UID}/podman/podman.sock
+export ARRFOLDER="${HOME}/repos/default/containers/sonarr"
