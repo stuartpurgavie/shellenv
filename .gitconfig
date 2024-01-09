@@ -21,15 +21,6 @@
     # Check Out Branch using team naming convention
     cob    = "!f() { ticketnum=$1; branchName=$2; git co -b \"$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git or; }; f"
     cod    = "!f() { ticketnum=$1; branchName=$2; git co -b \"$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git ord; }; f"
-    # Check Out Branch using BitBucket-style team naming convention
-    cobf   = "!f() { ticketnum=$1; branchName=$2; git co -b \"feature/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git or; }; f"
-    codf   = "!f() { ticketnum=$1; branchName=$2; git co -b \"feature/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git ord; }; f"
-    cobr   = "!f() { ticketnum=$1; branchName=$2; git co -b \"release/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git or; }; f"
-    codr   = "!f() { ticketnum=$1; branchName=$2; git co -b \"release/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git ord; }; f"
-    cobb   = "!f() { ticketnum=$1; branchName=$2; git co -b \"bugfix/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git or; }; f"
-    codb   = "!f() { ticketnum=$1; branchName=$2; git co -b \"bugfix/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git ord; }; f"
-    cobh   = "!f() { ticketnum=$1; branchName=$2; git co -b \"hotfix/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git or; }; f"
-    codh   = "!f() { ticketnum=$1; branchName=$2; git co -b \"hotfix/$(git cf user.jira)-${ticketnum}/$(git cf --global user.email | grep -o '^[^@]*')/${branchName}\"; git ord; }; f"
     # git finish: DELETES current branch and any backups, checks out updated main branch. Doesn't delete commits - can always checkout by hash in emergency :)
     finish = "!f() { git cork; b=$(git cb); if [ \"${b}\" = \"$(git cf user.main)\" ]; then echo 'Cannot execute on main branch'; return 1; fi; git krm; git fm; git br -D ${b}; git brrd ${b}; }; f"
     # git ss: Soft Squash using reset --soft to automatically squash everything between latest commit and main branch, then lets you amend the message if necessary
@@ -49,8 +40,8 @@
     pr   = !git ccc 1 && git kc && git or && git po  && git hub && hub pull-request -d
     prf  = !git ccc 1 && git kc && git or && git pof && git hub && hub pull-request -d
     # git or: Origin Rebase using local main branch instead of detached origin/main branch
-    or   = !git fetch --all --prune && br=$(git cb) && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only && git co ${br} && git rebase $(git cf user.main)
-    ord  = !git fetch --all --prune && br=$(git cb) && git co $(git cf user.dev) && git merge origin/$(git cf user.dev) --ff-only && git co ${br} && git rebase $(git cf user.dev)
+    or   = !git fetch --all --prune && declare br=$(git cb) && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only && git co ${br} && git rebase $(git cf user.main)
+    ord  = !git fetch --all --prune && declare br=$(git cb) && git co $(git cf user.dev) && git merge origin/$(git cf user.dev) --ff-only && git co ${br} && git rebase $(git cf user.dev)
     # git up: Working with Submodules consistently
     up   = !git pull --rebase --prune $@ && git submodule update --init --recursive
 
@@ -59,7 +50,6 @@
     brrd = push origin --delete             # Branch Remote Delete
     ca   = commit --amend
     cb   = rev-parse --abbrev-ref HEAD      # Current Branch
-    cd   = "!f() { tld=$(git dir); echo \"Changing directory to ${tld}\"; cd ${tld}; }; f"      # Change Directory to git root
     cf   = config
     ci   = commit
     cif  = "!f() { terraform fmt -recursive $(git dir); git ci \"$@\" }; f"
@@ -74,6 +64,8 @@
     st   = status
     tld  = !cd $(git dir)                   # Copy of 'git cd' but with the "top level directory" abbrev.
     type = cat-file -t
+    ori  = remote get-url origin
+    ttag = describe --abbrev=0
 
     ##### Branch Backup Commands
     #    git rek: REcover latest bacKup branch
@@ -81,7 +73,7 @@
     #    git cork: Check Out Root of bacKup branch (when in a backup branch)
     cork = !git co $(git krb)
     #    git kc: bacKup Create branch using naming convention '=b=##'
-    kc   = "!f() { for i in {01..99}; do d=\"$(printf '%02d' ${i})\"; n=\"$(git krb)=b=${d}\"; if [ $(git bx ${n}) -gt 0 ]; then break; fi; done; git br ${n}; echo \"Backup ${d} created: '${n}'\"; }; f"
+    kc   = "!f() { for i in {01..99}; do d=\"$(printf '%02d' ${i})\"; declare n=\"$(git krb)=b=${d}\"; if [ $(git bx ${n}) -gt 0 ]; then break; fi; done; git br ${n}; echo \"Backup ${d} created: '${n}'\"; }; f"
     #    git kg: bacKup Get branches with same core name
     kg   = !git br --list \"$(git krb)=b=*\" --format='%(refname:lstrip=2)'
     #    git krb: bacKup Root Branch name to stdout
@@ -99,12 +91,15 @@
     cc   = "!f() { git shortlog $(git cf user.main)..HEAD | grep -E '^[ ]+\\w+' | wc -l ;}; f"
     ccd  = "!f() { git shortlog $(git cf user.dev)..HEAD | grep -E '^[ ]+\\w+' | wc -l ;}; f"
     # git ccc 1: Commit Count Check, accepts an interger as an argument
-    ccc  = "!f() { c=${1}; i=$(git cc); [ ${i} -eq ${c} ] && return 0 || { printf \"Commit Count since main branch restricted\ncounted: ${i}\nwanted: ${c}\\nuse 'git ss' first\" && return 1 ;} ;}; f"
+    ccc  = "!f() { declare -i c=${1}; declare -i i=$(git cc); [ ${i} -eq ${c} ] && return 0 || { printf \"Commit Count since main branch restricted\ncounted: ${i}\nwanted: ${c}\\nuse 'git ss' first\" && return 1 ;} ;}; f"
     # Commit message Log since main branch (also saves in temporary template file)
     cl   = !git --no-pager log --reverse --format="%x2D%x20%s%n%b" $(git cf user.main)..$(git cb) | tee "$(git tp)"
     cld  = !git --no-pager log --reverse --format="%x2D%x20%s%n%b" $(git cf user.dev)..$(git cb) | tee "$(git tp)"
     # git tp: TemPlate file location, anything inside the .git directory is ignored from commits so is 'safe' location, used for default commit message
     tp   = !echo "$(git dir)/$(git gdir)/template"
+    # git zip / tar : create archive of repo
+    zip  = !git archive --format=zip    --output=$(basename -s.git $(git ori))-$(git ttag).zip    $(git ttag)
+    tar  = !git archive --format=tar.gz --output=$(basename -s.git $(git ori))-$(git ttag).tar.gz $(git ttag)
     
     ##### Tests
     # git bx: Branch Exists test
@@ -114,9 +109,9 @@
 
     ##### Status Tools
     hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
-    ls   = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
-    lsm  = "!git log --pretty=format:\"%C(yellow)%H%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate $(git cf user.main)..HEAD"
-    lsd  = "!git log --pretty=format:\"%C(yellow)%H%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate $(git cf user.dev)..HEAD"
+    ls   = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%C(cyan)\\ [%cn\\ %ae\\ %G?]" --decorate
+    lsm  = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%C(cyan)\\ [%cn]" --decorate $(git cf user.main)..HEAD
+    lsd  = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%C(cyan)\\ [%cn]" --decorate $(git cf user.dev)..HEAD
 
 [commit]
     gpgsign = true

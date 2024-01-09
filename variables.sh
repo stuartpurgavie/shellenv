@@ -14,18 +14,20 @@ export PATH="${PATH}:${HOME}/.local/bin"
 
 export EDITOR='vim'
 
+export UPALL_CMD="lupall"
+
 if [[ "${OSTYPE}" = darwin* ]]; then
-  AWS_ACCESS_KEY_ID=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_access -w)
-  AWS_SECRET_ACCESS_KEY=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_secret -w)
-  AWS_SESSION_TOKEN=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_session -w)
-  export AWS_ACCESS_KEY_ID
-  export AWS_SECRET_ACCESS_KEY
-  export AWS_SESSION_TOKEN
+  #AWS_ACCESS_KEY_ID=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_access -w)
+  #AWS_SECRET_ACCESS_KEY=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_secret -w)
+  #AWS_SESSION_TOKEN=$(security find-generic-password -a "${USER}" -s aws_dou_terraform_training_session -w)
+  #export AWS_ACCESS_KEY_ID
+  #export AWS_SECRET_ACCESS_KEY
+  #export AWS_SESSION_TOKEN
 
-  # Python Vault Onboarding Script
-  GL_TKN=$(security find-generic-password -a "${USER}" -s tmo_gitlab_access_key -w)
-  export GL_TKN
-
+  ## Python Vault Onboarding Script
+  #GL_TKN=$(security find-generic-password -a "${USER}" -s tmo_gitlab_access_key -w)
+  #export GL_TKN
+  export UPALL_CMD="burp"
 fi
 
 # Tools

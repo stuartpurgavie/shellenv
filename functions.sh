@@ -168,8 +168,8 @@ function cl() {
     # use your preferred ls command
     if type l > /dev/null 2>&1 ; then
       l
-    elif type exa > /dev/null 2>&1 ; then
-      exa -lahg
+    elif type eza > /dev/null 2>&1 ; then
+      eza -lahg
     elif type gls > /dev/null 2>&1 ; then
       gls -alh --color=auto
     else
@@ -197,6 +197,10 @@ function git() {
             client[gpg]="6AD861E9D496B34FB41EC558FCAA9A536B5B4387"
             client[email]="stuartpurgavie@uniqueservice.ca"
             client[ssh]="def"
+        ;;
+        cd)
+            cd "$(git dir)" || return 1
+            return 0
         ;;
         *)
             command git "$@"
@@ -245,11 +249,11 @@ currentshell() {
 
 function hvtoken() {
     case $(currentshell) in
-    zsh)
+    zsh|-zsh)
         IFS= read -rs "VAULT_TOKEN?Please enter client token: "
         printf "\n"
     ;;
-    bash)
+    bash|-bash)
         IFS= read -rs -p "Please enter client token: " VAULT_TOKEN
         printf "\n"
     ;;
@@ -259,6 +263,25 @@ function hvtoken() {
     ;;
     esac
     export VAULT_TOKEN
+}
+
+function secret() {
+    var="${1}"
+    case $(currentshell) in
+    zsh|-zsh)
+        IFS= read -rs "${var}?Please enter secret value: "
+        printf "\n"
+    ;;
+    bash|-bash)
+        IFS= read -rs -p "Please enter secret value: " "${var?}"
+        printf "\n"
+    ;;
+    *)
+        echoerr "shell $(currentshell) not supported"
+        return 1
+    ;;
+    esac
+    export "${var?}"
 }
 
 function keybase_hack() {
