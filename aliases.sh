@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # User Defined Aliases
+alias p10kup='printf "Updating powerlevel10k... " && git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull'
 
 # BREW
 alias brewp='brew pin'
@@ -12,9 +13,9 @@ alias buf='brew upgrade --formula'
 alias bcubo='brew update && brew outdated --cask'
 alias bcubc='brew upgrade --cask && brew cleanup'
 alias bcubu='bcubo && bcubc'
-alias burp='bubo && brew outdated --cask && brew upgrade && brew upgrade --cask && brew cleanup'
+alias burp='bubo && brew outdated --cask && brew upgrade && brew upgrade --cask && brew cleanup && p10kup'
 alias sburp='sudo brew update && sudo brew outdated && sudo brew outdated --cask && sudo brew upgrade && sudo brew upgrade --cask && sudo brew cleanup'
-alias lupall='bubu && sudo dnf upgrade -y && sudo flatpak update -y'
+alias lupall='bubu && sudo dnf upgrade -y && sudo flatpak update -y && p10kup'
 alias upall="\${UPALL_CMD}"
 
 # Environment

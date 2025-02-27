@@ -14,6 +14,11 @@
 [core]
     editor = codium --wait
     autocrlf = false
+    excludesfile = ~/.gitignore
+    # Can be heavy on CPU and only really useful on large repos with lots of files
+    # disable if perf impact and enable per-repo instead for better performance
+    fsmonitor = true
+    untrackedCache = true
 [gpg]
     program = gpg
 [alias]
@@ -24,48 +29,58 @@
     # git finish: DELETES current branch and any backups, checks out updated main branch. Doesn't delete commits - can always checkout by hash in emergency :)
     finish = "!f() { git cork; b=$(git cb); if [ \"${b}\" = \"$(git cf user.main)\" ]; then echo 'Cannot execute on main branch'; return 1; fi; git krm; git fm; git br -D ${b}; git brrd ${b}; }; f"
     # git ss: Soft Squash using reset --soft to automatically squash everything between latest commit and main branch, then lets you amend the message if necessary
-    ss     = !git kc && git cl && git or && git reset --soft $(git merge-base $(git cf user.main) $(git cb)) && git cm -F "$(git tp)" && git ca
-    ssd    = !git kc && git cld && git ord && git reset --soft $(git merge-base $(git cf user.dev) $(git cb)) && git cm -F "$(git tp)" && git ca
+    ss     = !git kc && git cl  && git or  && git rs $(git merge-base $(git cf user.main) $(git cb)) && git cf commit.template "$(git tp)" && git cm && git cf commit.template ""
+    ssd    = !git kc && git cld && git ord && git rs $(git merge-base $(git cf user.dev)  $(git cb)) && git cf commit.template "$(git tp)" && git cm && git cf commit.template ""
     # git tw: Tweak a previously pushed PR on same branch (will prompt you for a new commit message)
     tw     = !git cm -m "Tweaked! (Change Me)" && git ss && git pof
     
     ##### Remotes and Pull Requests
     # git fm: Fetch main branch and check it out
-    fm   = !git fetch --all --prune && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only
-    fd   = !git fetch --all --prune && git co $(git cf user.dev) && git merge origin/$(git cf user.dev) --ff-only
+    fm   = !git fa && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only
+    fd   = !git fa && git co $(git cf user.dev)  && git merge origin/$(git cf user.dev)  --ff-only
     # git po: Push Origin (pof: with force flag '+' in case you've rewritten history locally through squash or reset)
     po   = !git push origin  $(git cb)
     pof  = !git push origin +$(git cb)
     # git pr: DRAFT Pull Request on origin using hub binary to execute (use prf if you've previously closed a PR on this branch)
-    pr   = !git ccc 1 && git kc && git or && git po  && git hub && hub pull-request -d
-    prf  = !git ccc 1 && git kc && git or && git pof && git hub && hub pull-request -d
+    pr   = !git ccc 1 && git kc && git or && git po  && git gh && gh pr create --base \"$(git cf user.main)\" --title \"$(git log -1 --pretty=%B)\" --head \"$(git cb)\" --body \"\" --draft
+    prf  = !git ccc 1 && git kc && git or && git pof && git gh && gh pr create --base \"$(git cf user.main)\" --title \"$(git log -1 --pretty=%B)\" --head \"$(git cb)\" --body \"\" --draft
     # git or: Origin Rebase using local main branch instead of detached origin/main branch
-    or   = !git fetch --all --prune && declare br=$(git cb) && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only && git co ${br} && git rebase $(git cf user.main)
-    ord  = !git fetch --all --prune && declare br=$(git cb) && git co $(git cf user.dev) && git merge origin/$(git cf user.dev) --ff-only && git co ${br} && git rebase $(git cf user.dev)
+    or   = !git fa && declare br=$(git cb) && git co $(git cf user.main) && git merge origin/$(git cf user.main) --ff-only && git co ${br} && git rebase $(git cf user.main)
+    ord  = !git fa && declare br=$(git cb) && git co $(git cf user.dev)  && git merge origin/$(git cf user.dev)  --ff-only && git co ${br} && git rebase $(git cf user.dev)
     # git up: Working with Submodules consistently
     up   = !git pull --rebase --prune $@ && git submodule update --init --recursive
+    # git cor: Check Out Remote branch
+    cor  = "!f() { branchName=$1; git dhaf; git fa && git co remotes/origin/${branchName} && git co -b ${branchName} && git br --set-upstream-to origin/${branchName}; git dhan; }; f"
 
     ##### Shorthand Commands
     br   = branch
+    bra  = branch --all
     brrd = push origin --delete             # Branch Remote Delete
     ca   = commit --amend
     cb   = rev-parse --abbrev-ref HEAD      # Current Branch
     cf   = config
     ci   = commit
-    cif  = "!f() { terraform fmt -recursive $(git dir); git ci \"$@\" }; f"
+    cia  = commit --all --gpg-sign --message
+    cif  = "!f() { terraform fmt -recursive $(git dir); git ci \"$@\"; }; f"
     cm   = !git add -A && git commit        # Depending on your pattern, better than 'git commit -a'
     co   = checkout
     dir  = rev-parse --show-toplevel        # Show absolute path to git directory on filesystem
     dump = cat-file -p
+    fa   = fetch --all --prune
     gdir = rev-parse --git-dir
     hash = log -n 1 --pretty=format:"%H%n"  # Show full hash of current HEAD commit
     head = reset HEAD --hard
+    ori  = remote get-url origin
+    rbs  = rebase --exec 'git commit --amend --no-edit -n -S' -i # Rebase with no edits for purposes of gpg signing
+    rs   = reset --soft
+    rh   = reset --hard
+    sa   = stash apply
+    sh   = stash
     show = !git diff origin $(git cf user.main)
     st   = status
     tld  = !cd $(git dir)                   # Copy of 'git cd' but with the "top level directory" abbrev.
-    type = cat-file -t
-    ori  = remote get-url origin
     ttag = describe --abbrev=0
+    type = cat-file -t
 
     ##### Branch Backup Commands
     #    git rek: REcover latest bacKup branch
@@ -100,12 +115,23 @@
     # git zip / tar : create archive of repo
     zip  = !git archive --format=zip    --output=$(basename -s.git $(git ori))-$(git ttag).zip    $(git ttag)
     tar  = !git archive --format=tar.gz --output=$(basename -s.git $(git ori))-$(git ttag).tar.gz $(git ttag)
+    # git dha: detached HEAD advice on/off
+    dhan = !git config advice.detachedHead true
+    dhaf = !git config advice.detachedHead true
+    # If you've committed files that shouldn't be committed according to .gitignore
+    apply-gitignore = !git ls-files -ci --exclude-standard -z | xargs -0 git rm --cached
+    # Set per-repository core settings for file list caching which improves diff speeds in large repos, overkill in small repos
+    # Paired with the core.fsmonitor and core.untrackedCache global settings above
+    lrgr = !git cf core.fsmonitor true  && git cf core.untrackedCache true
+    smlr = !git cf core.fsmonitor false && git cf core.untrackedCache false
+    nulr = !git cf unset core.fsmonitor && git cf unset core.untrackedCache
     
     ##### Tests
     # git bx: Branch Exists test
     bx   = "!f() { branchName=$1; git show-ref --verify --quiet refs/heads/${branchName} ; e=${?}; echo ${e}; return ${e}; }; f"
     # git hub: Check 'hub' binary installed
     hub  = "!f() { command -v hub >/dev/null 2>&1 || { echo 'hub binary not installed'; return 1; }; }; f"
+    gh   = "!f() { command -v gh  >/dev/null 2>&1 || { echo 'gh  binary not installed'; return 1; }; }; f"
 
     ##### Status Tools
     hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
@@ -113,10 +139,20 @@
     lsm  = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%C(cyan)\\ [%cn]" --decorate $(git cf user.main)..HEAD
     lsd  = log --pretty=format:"%C(yellow)%H%Cred%d\\ %Creset%s%C(cyan)\\ [%cn]" --decorate $(git cf user.dev)..HEAD
 
+    ##### Convco-based Commands
+    # ver: create new tag based on conventional commits since last tag
+    ver  = "!f() { git tag -a \"$(convco version --bump --print-prefix)\" -m \"$(git log -1 --pretty=%B)\"; }; f"
+    # pot: push to origin the latest tag in the repository
+    pot  = "!f() { git push origin \"$(convco version --print-prefix)\"; }; f"
+
 [commit]
     gpgsign = true
+    verbose = true
+[tag]
+    gpgsign = true
+    sort = version:refname
 [merge]
-    conflictstyle = diff3
+    conflictstyle = zdiff3
 [color]
     ui = auto
 [hub]
@@ -149,3 +185,33 @@
     commit-decoration-style = bold yellow box ul
     file-style = bold yellow ul
     file-decoration-style = none
+
+[column]
+    ui = auto
+[branch]
+    sort = -committerdate
+[diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+[push]
+    autoSetupRemote = true
+    # This setting will make it so all local tags are always pushed whenever ANYTHING else is pushed - good setting but need to be aware it's happening
+    # followTags = true
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
+[help]
+    autocorrect = prompt
+[rerere]
+    enabled = true
+    autoupdate = true
+[rebase]
+    autoSquash = true
+    autoStash = true
+    updateRefs = true
+[pull]
+    # Only turn this on if you're an overzealous rebaser and dislike the default pull behaviour
+    rebase = true
