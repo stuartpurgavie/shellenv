@@ -117,7 +117,7 @@
     tar  = !git archive --format=tar.gz --output=$(basename -s.git $(git ori))-$(git ttag).tar.gz $(git ttag)
     # git dha: detached HEAD advice on/off
     dhan = !git config advice.detachedHead true
-    dhaf = !git config advice.detachedHead true
+    dhaf = !git config advice.detachedHead false
     # If you've committed files that shouldn't be committed according to .gitignore
     apply-gitignore = !git ls-files -ci --exclude-standard -z | xargs -0 git rm --cached
     # Set per-repository core settings for file list caching which improves diff speeds in large repos, overkill in small repos
